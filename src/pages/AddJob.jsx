@@ -1,12 +1,39 @@
 import Lottie from "lottie-react";
 import ApplyAnimationData from "../assets/apply.json";
+import Swal from "sweetalert2";
 
 const handleAddJob = (e) => {
   e.preventDefault();
   const formData = new FormData(e.target);
-  //   console.log(form);
   const jobData = Object.fromEntries(formData.entries());
-  console.log(jobData);
+  //   console.log(jobData);
+  const { max, min, currency, ...newJob } = jobData;
+  //   console.log(newJob);
+  newJob.salaryRange = { max, min, currency };
+  //   console.log(newJob);
+  newJob.requirements = newJob.requirements.split("\n");
+  newJob.responsibilities = newJob.responsibilities.split("\n");
+
+  fetch("http://localhost:5000/jobs", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(newJob),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      //   console.log(data);
+      if (data.insertedId) {
+        Swal.fire({
+          position: "top-center",
+          icon: "success",
+          title: "Job Added Successfully",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+    });
 };
 export default function AddJob() {
   return (
@@ -55,23 +82,19 @@ export default function AddJob() {
             <div className="grid grid-cols-3 gap-2">
               <input
                 type="number"
-                name="salaryMin"
+                name="min"
                 placeholder="Min Salary"
                 className="border p-2 rounded"
                 required
               />
               <input
                 type="number"
-                name="salaryMax"
+                name="max"
                 placeholder="Max Salary"
                 className="border p-2 rounded"
                 required
               />
-              <select
-                name="salaryCurrency"
-                className="border p-2 rounded"
-                required
-              >
+              <select name="currency" className="border p-2 rounded" required>
                 <option value="">Currency</option>
                 <option value="BDT">BDT</option>
                 <option value="USD">USD</option>
