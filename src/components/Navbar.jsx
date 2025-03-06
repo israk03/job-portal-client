@@ -15,7 +15,7 @@ export default function Navbar() {
         <NavLink>All Job</NavLink>
       </li>
       <li>
-        <NavLink>Add a job</NavLink>
+        <NavLink to="/addJob">Add a job</NavLink>
       </li>
       <li>
         <NavLink to="/myApplication">My Applications</NavLink>
