@@ -1,41 +1,50 @@
 import Lottie from "lottie-react";
 import ApplyAnimationData from "../assets/apply.json";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import AuthContext from "../context/AuthContext";
 
-const handleAddJob = (e) => {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-  const jobData = Object.fromEntries(formData.entries());
-  //   console.log(jobData);
-  const { max, min, currency, ...newJob } = jobData;
-  //   console.log(newJob);
-  newJob.salaryRange = { max, min, currency };
-  //   console.log(newJob);
-  newJob.requirements = newJob.requirements.split("\n");
-  newJob.responsibilities = newJob.responsibilities.split("\n");
-
-  fetch("http://localhost:5000/jobs", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-    },
-    body: JSON.stringify(newJob),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      //   console.log(data);
-      if (data.insertedId) {
-        Swal.fire({
-          position: "top-center",
-          icon: "success",
-          title: "Job Added Successfully",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-      }
-    });
-};
 export default function AddJob() {
+  const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+
+  const handleAddJob = (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const jobData = Object.fromEntries(formData.entries());
+    //   console.log(jobData);
+    const { max, min, currency, ...newJob } = jobData;
+    //   console.log(newJob);
+    newJob.salaryRange = { max, min, currency };
+    //   console.log(newJob);
+    newJob.requirements = newJob.requirements.split("\n");
+    newJob.responsibilities = newJob.responsibilities.split("\n");
+
+    fetch("http://localhost:5000/jobs", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(newJob),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        //   console.log(data);
+        if (data.insertedId) {
+          Swal.fire({
+            position: "top-center",
+            icon: "success",
+            title: "Job Added Successfully",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          navigate("/myPostedJob");
+        }
+      });
+  };
+  // export default function AddJob() {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 p-6 px-4 my-10">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
@@ -127,6 +136,7 @@ export default function AddJob() {
             <input
               type="email"
               name="hr_email"
+              value={user.email}
               placeholder="HR Email"
               className="border p-2 rounded"
               required
